@@ -11,6 +11,7 @@ def sendMail():
 
     print("Fill in the information: (press enter to skip)")
     emailTo = input("To: ").split(sep=',')
+    print(emailTo)
     emailCC = input("CC: ").split(sep=',')
     emailBCC = input("BCC: ").split(sep=',')
     subject = input("Subject: ")
@@ -36,21 +37,33 @@ def sendMail():
         mailFromUser = f'MAIL FROM:{configData["Username"]}\r\n'
         s.sendall(mailFromUser.encode())
 
+        print(emailTo)
         # mail to
         for i in emailTo:
+            print("DKm")
+            i = i.strip()
             e = f'RCPT TO:{i}\r\n'
             s.sendall(e.encode())
+            s.recv(1024)
+
         for i in emailCC:
+            i = i.strip()
             e = f'RCPT TO:{i}\r\n'
             s.sendall(e.encode())
+            s.recv(1024)
+
+
         for i in emailBCC:
+            i = i.strip()
             e = f'RCPT TO:{i}\r\n'
             s.sendall(e.encode())
+            s.recv(1024)
+
 
         # mail content
         s.sendall(b'DATA\r\n')
         data_response = s.recv(1024)
-        emailContent = f'{subject}\r\n\r\n{content} + "."\r\n.\r\n'
+        emailContent = f'{subject}\r\n\r\n{content}\r\n.\r\n'
         s.sendall(emailContent.encode())
 
 
