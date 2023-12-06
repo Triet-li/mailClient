@@ -1,18 +1,25 @@
 
-import socket
+import socket, json
+import os
 
-HOST = "127.0.0.1"
-PORT = 22212
+configFile = open('config.json')
+configData = json.load(configFile)
+configFile.close()
+
+HOST = configData["MailServer"]
+PORT = configData["POP3"]
 
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
     s.recv(1024)
-
-    s.sendall(b'USER triethouse@gmail.com\r\n')
+ 
+    user = f'USER {configData["Username"]}\r\n'
+    s.sendall(user.encode())
     print(s.recv(1024).decode())
 
-    s.sendall(b'PASS trietpro2\r\n')
+    Password = f'PASS {configData["Password"]}\r\n'
+    s.sendall(Password.encode())
     print(s.recv(1024).decode())
 
     s.sendall(b'RETR 2\r\n')

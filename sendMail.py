@@ -1,8 +1,12 @@
 
-import socket
+import socket, json
 
-HOST = "127.0.0.1"
-PORT = 22345
+configFile = open('config.json')
+configData = json.load(configFile)
+configFile.close()
+
+HOST = configData["MailServer"]
+PORT = configData["SMTP"]
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
@@ -15,14 +19,15 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print(ehlo_response.decode())
 
      # Send the MAIL FROM and RCPT TO commands
-    s.sendall(b'MAIL FROM:triethouse@gmail.com\r\n')
+    mailFromUser = f'MAIL FROM:{configData["Username"]}\r\n'
+    s.sendall(mailFromUser.encode())
     s.sendall(b'RCPT TO:triethouse@gmail.com\r\n')
 
     s.sendall(b'DATA\r\n')
     data_response = s.recv(1024)
     print(data_response.decode())
 
-    s.sendall(b'Subject: ok bro\r\n\r\nhehehehehehhehe\r\n.\r\n')
+    s.sendall(b'Subject: deo ok nha bro\r\n\r\hahahha\r\n.\r\n')
 
      # Quit the session
     s.sendall(b'QUIT\r\n')
