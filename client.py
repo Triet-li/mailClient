@@ -10,9 +10,9 @@ while True:
     option = int(input("Picking: "))
     if option == 3:
         break
-    elif option == 2:
-        sendMail.sendMail()
     elif option == 1:
+        sendMail.sendMail()
+    elif option == 2:
         getMail.getMail()
     else:
         print("Invalid input. Please choose again.")
