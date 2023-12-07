@@ -1,6 +1,6 @@
 
 import socket, json
-
+import datetime
 def sendMail():
     configFile = open('config.json')
     configData = json.load(configFile)
@@ -11,7 +11,6 @@ def sendMail():
 
     print("Fill in the information: (press enter to skip)")
     emailTo = input("To: ").split(sep=',')
-    print(emailTo)
     emailCC = input("CC: ").split(sep=',')
     emailBCC = input("BCC: ").split(sep=',')
     subject = input("Subject: ")
@@ -23,10 +22,9 @@ def sendMail():
         for i in range(numOfAttachFiles):
             path = input(f"Path to file {i+1}: ")
             path2AttachFiles.append(path)
-
+    
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
-
         welcome_msg = s.recv(1024)
         #print(welcome_msg.decode())
 
@@ -37,10 +35,8 @@ def sendMail():
         mailFromUser = f'MAIL FROM:{configData["Username"]}\r\n'
         s.sendall(mailFromUser.encode())
 
-        print(emailTo)
         # mail to
         for i in emailTo:
-            print("DKm")
             i = i.strip()
             e = f'RCPT TO:{i}\r\n'
             s.sendall(e.encode())
@@ -52,7 +48,6 @@ def sendMail():
             s.sendall(e.encode())
             s.recv(1024)
 
-
         for i in emailBCC:
             i = i.strip()
             e = f'RCPT TO:{i}\r\n'
@@ -63,11 +58,17 @@ def sendMail():
         # mail content
         s.sendall(b'DATA\r\n')
         data_response = s.recv(1024)
-        emailContent = f'{subject}\r\n\r\n{content}\r\n.\r\n'
-        s.sendall(emailContent.encode())
 
-
-        print("\nEmail sent\n")
+        e = [f"Subject: {subject}", f"To: {','.join(emailTo)}", f"CC: {','.join(emailCC)}", 
+             f"From: {configData['Username']}", "\r\n", f'{content}\r\n.\r\n']
+        email = "\n".join(e)
+        
+     
+        # {content}\r\n.\r\n'''
+        s.sendall(email.encode())
+        ok = s.recv(1024)
+        
+        print("\nSent\n")
         # Quit the session
         s.sendall(b'QUIT\r\n')
         quit_response = s.recv(1024)
