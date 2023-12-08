@@ -2,6 +2,11 @@
 import socket, json
 import datetime
 def sendMail():
+
+    configFile2 = open('sender.json')
+    sender = json.load(configFile2)["sender"]
+    configFile2.close()
+
     configFile = open('config.json')
     configData = json.load(configFile)
     configFile.close()
@@ -32,7 +37,7 @@ def sendMail():
         ehlo_response = s.recv(1024)
 
         # mail from
-        mailFromUser = f'MAIL FROM:{configData["Username"]}\r\n'
+        mailFromUser = f'MAIL FROM:{sender}\r\n'
         s.sendall(mailFromUser.encode())
 
         # mail to
@@ -59,13 +64,35 @@ def sendMail():
         s.sendall(b'DATA\r\n')
         data_response = s.recv(1024)
 
-        e = [f"Subject: {subject}", f"To: {','.join(emailTo)}", f"CC: {','.join(emailCC)}", 
-             f"From: {configData['Username']}", "\r\n", f'{content}\r\n.\r\n']
-        email = "\n".join(e)
+        # Construct MIME-formatted email
+        email_data = f"To: {', '.join(emailTo)}\r\n"
+        email_data +=  f"Cc: {','.join(emailCC)}\r\n"
+        email_data += f"From: {configData['Username']}\r\n"
+        email_data += f"Subject: {subject}\r\n"
+        email_data += f"Date: abc\r\n"
+        #email_data += "MIME-Version: 1.0\r\n"
+        email_data += "Content-Type: multipart/mixed;\r\n boundary=myboundary\r\n"
+
+        # Text part
+        email_data += "--myboundary\r\n"
+        email_data += "Content-Type: text/plain\r\n\r\n"
+        #email_data += "Content-Transfer-Encoding: 7bit\r\n\r\n"
+        email_data += f"{content}\r\n\r\n"
+
+        # Attach file ( base64 )
+
+
+        # Closing boundary
+        email_data += "--myboundary\r\n"
+        email_data += ".\r\n"
+
+        # e = [ f"To: {','.join(emailTo)}", f"CC: {','.join(emailCC)}",  f"From: {configData['Username']}",
+        #      f"Subject: {subject}", "\r\n", f'{content}\r\n.\r\n', f"Date: abc", f"MIME-Version: 1.0"]
+        # email = "\n".join(e)
         
      
-        # {content}\r\n.\r\n'''
-        s.sendall(email.encode())
+
+        s.sendall(email_data.encode())
         ok = s.recv(1024)
         
         print("\nSent\n")
