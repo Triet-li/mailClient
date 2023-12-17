@@ -148,7 +148,7 @@ def viewEmailFolder(s, mailboxName, folderOption):
             print(f'{count+1}. {msgFrom}, {msgSubject}')
             count = count + 1
 
-    check.close()
+    
     os.chdir(MYPATH)
 
 def createMailbox(mailboxName):

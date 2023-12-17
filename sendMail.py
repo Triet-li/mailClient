@@ -1,6 +1,7 @@
 
 import socket, json
 import datetime
+import base64
 def sendMail():
 
     configFile2 = open('sender.json')
@@ -22,6 +23,7 @@ def sendMail():
     content = input("Content: ")
     hasAttachFiles = int(input("Has attach files? (1. yes, 2. no): "))
     path2AttachFiles = []
+    numOfAttachFiles = 0
     if hasAttachFiles == 1:
         numOfAttachFiles = int(input("How many: "))
         for i in range(numOfAttachFiles):
@@ -80,7 +82,19 @@ def sendMail():
         email_data += f"{content}\r\n\r\n"
 
         # Attach file ( base64 )
-
+        if numOfAttachFiles > 0:
+            filesExtension = []
+            for i in path2AttachFiles:
+                if i.endswith('.docx'): 
+                    filesExtension.append('docx')
+                elif i.endswith('.pdf'):
+                    filesExtension.append('pdf')
+                elif i.endswith('.jpg'):
+                    filesExtension.append('jpg')
+                elif i.endswith('.zip'):
+                    filesExtension.append('zip')
+                elif i.endswith('.txt'):
+                    filesExtension.append('txt')
 
         # Closing boundary
         email_data += "--myboundary\r\n"
